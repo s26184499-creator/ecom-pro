@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // ✅ auth middleware
-const auth = require("../middleware/auth");
+const auth = require("../middleware/authMiddleware");
 
 // ✅ CORRECT function names
 const {

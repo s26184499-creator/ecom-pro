@@ -56,61 +56,12 @@
 </div>
 
 <!-- ===== SCRIPTS ===== -->
-<script src="products.js"></script>
 <script src="auth.js"></script>
+<script src="products.js"></script>
 <script src="script.js"></script>
 
-<script>
-const box = document.getElementById("productList");
 
-// ⭐ Random ratings for demo
-function getStars() {
-  const rating = Math.floor(Math.random() * 2) + 4; // 4 or 5
-  return "⭐".repeat(rating) + "☆".repeat(5 - rating);
-}
 
-products.forEach(p => {
-  box.innerHTML += `
-    <div class="card" data-category="${p.category}">
-      <img src="${p.img}">
-      <h3>${p.name}</h3>
-      <div class="rating">${getStars()}</div>
-      <p>₹${p.price}</p>
-
-      <button onclick="openProduct(${p.id})">View</button>
-      <button onclick='protectedWishlist(${JSON.stringify(p)})'>
-        ❤️ Wishlist
-      </button>
-    </div>
-  `;
-});
-
-// Header auth UI
-if (isLoggedIn()) {
-  const user = getUser();
-  document.getElementById("userBox").innerText = "👤 " + user.name;
-  document.getElementById("loginLink").style.display = "none";
-  document.getElementById("signupLink").style.display = "none";
-  document.getElementById("logoutLink").style.display = "inline";
-}
-
-// Modal functions
-function openModal() {
-  document.getElementById("loginModal").style.display = "flex";
-}
-function closeModal() {
-  document.getElementById("loginModal").style.display = "none";
-}
-
-// Protected wishlist
-function protectedWishlist(product) {
-  if (!isLoggedIn()) {
-    openModal();
-    return;
-  }
-  addToWishlist(product);
-}
-</script>
 
 </body>
 </html>

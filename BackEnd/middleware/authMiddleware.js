@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const AUTH_API = "http://localhost:5000/api/auth";
 
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;

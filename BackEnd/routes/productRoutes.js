@@ -1,18 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/authMiddleware");
-const {
-  getAllProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct
-} = require("../controllers/productController");
+const Product = require("../models/Product");
 
-router.get("/", getAllProducts);
-router.get("/:id", getProductById);
-router.post("/", auth, createProduct);
-router.put("/:id", auth, updateProduct);   
-router.delete("/:id", auth, deleteProduct);
+// GET ALL PRODUCTS
+router.get("/", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch products" });
+  }
+});
 
 module.exports = router;

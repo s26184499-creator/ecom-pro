@@ -11,6 +11,8 @@ const Cart = require("./models/Cart");
 const Wishlist = require("./models/Wishlist");
 
 
+
+
 const app = express();
 const PORT = 5000;
 
@@ -29,7 +31,8 @@ app.use(express.urlencoded({ extended: true }));
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
-
+const productRoute = require("./routes/productRoutes");
+app.use("/api/products", productRoute);
 
 //Wishlist
 const wishlistRoutes = require("./routes/wishlistRoutes");
