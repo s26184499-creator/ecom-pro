@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="product.html">← Back</a>
+</header>
+
+<div class="container" id="productBox"></div>
+
+<script>
+const API = "http://localhost:5000/api/products";
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+const isEdit = params.get("edit") === "true";
+
+async function loadProduct() {
+  const res = await fetch(`${API}/${id}`);
+  const p = await res.json();
+
+  if (!isEdit) {
+    document.getElementById("productBox").innerHTML = `
+      <h2>${p.name}</h2>
+      <img src="${p.image || 'logo.png'}" width="200">
+      <p>₹${p.price}</p>
+      <p>${p.description || ""}</p>
+    `;
+  } else {
+    // EDIT FORM
+    document.getElementById("productBox").innerHTML = `
+      <h2>Edit Product</h2>
+
+      <input id="name" value="${p.name}" placeholder="Name">
+      <input id="price" value="${p.price}" placeholder="Price">
+      <input id="image" value="${p.image || ""}" placeholder="Image URL">
+      <textarea id="description">${p.description || ""}</textarea>
+
+      <button onclick="updateProduct()">Update</button>
+    `;
+  }
+}
+
+async function updateProduct() {
+  const data = {
+    name: document.getElementById("name").value,
+    price: document.getElementById("price").value,
+    image: document.getElementById("image").value,
+    description: document.getElementById("description").value
+  };
+
+  await fetch(`${API}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  alert("Product updated successfully");
+  window.location.href = "product.html";
+}
+
+loadProduct();
+</script>
+
+</body>
+</html>
