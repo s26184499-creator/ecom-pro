@@ -1,57 +1,48 @@
 const API = "http://localhost:5000/api/auth";
 
-
+// ================= LOGIN STATE =================
 function isLoggedIn() {
-  return sessionStorage.getItem("userEmail") !== null;
+  return sessionStorage.getItem("isLoggedIn") === "true";
 }
 
+function getUserName() {
+  return sessionStorage.getItem("userName");
+}
 
-// SIGNUP
+// ================= SIGNUP =================
 async function signupUser(e) {
-  e.preventDefault(); // stop page refresh
-
+  e.preventDefault();
 
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-
-  // basic validation
   if (!name || !email || !password) {
     alert("All fields are required");
     return;
   }
 
-
   try {
-    const response = await fetch("http://localhost:5000/api/auth/signup", {
+    const res = await fetch(`${API}/signup`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password })
     });
 
+    const data = await res.json();
 
-    const data = await response.json();
-    console.log("Backend response:", data); 
-
-
-    if (response.ok) {
+    if (res.ok) {
       alert("Signup successful");
+      window.location.href = "login.html";
     } else {
       alert(data.message || "Signup failed");
     }
-  } catch (error) {
-    console.error("Fetch error:", error);
+  } catch {
     alert("Server not reachable");
   }
 }
 
-
-
-
-// LOGIN
+// ================= LOGIN =================
 async function loginUser(e) {
   e.preventDefault();
 
@@ -71,26 +62,29 @@ async function loginUser(e) {
     });
 
     const data = await res.json();
-    console.log("Login response:", data);
 
     if (res.ok) {
-      alert("Login successful");
-      sessionStorage.setItem("userEmail", email);
-      sessionStorage.setItem("userName", data.user?.name || "");
+      // ✅ SET LOGIN STATE
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("userName", data.name || "User");
+
       window.location.href = "index.html";
     } else {
       alert(data.message || "Login failed");
     }
-
-  } catch (error) {
-    console.error(error);
+  } catch {
     alert("Server error");
   }
 }
+function toggleDropdown() {
+  const menu = document.getElementById("dropdownMenu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
 
-// LOGOUT
+// ================= LOGOUT =================
 function logout() {
-  sessionStorage.clear();
-  alert("Logged out successfully");
+  sessionStorage.setItem("isLoggedIn", "false");
+  sessionStorage.removeItem("userName");
+
   window.location.href = "login.html";
 }

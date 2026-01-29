@@ -1,20 +1,27 @@
 // ================= CONFIG =================
 const CART_API = "http://localhost:5000/api/cart";
-const userEmail = sessionStorage.getItem("userEmail");
 const cartBox = document.getElementById("cartBox");
 
-// ================= SAFETY CHECK =================
-if (!userEmail) {
+// ================= LOGIN CHECK =================
+if (sessionStorage.getItem("isLoggedIn") !== "true") {
   alert("Please login first");
   window.location.href = "login.html";
 }
 
 // ================= FETCH CART =================
-function fetchCart() {
-  fetch(`${CART_API}/${userEmail}`)
-    .then(res => res.json())
-    .then(data => renderCart(data.cart))
-    .catch(err => console.error(err));
+async function fetchCart() {
+  try {
+    const res = await fetch(CART_API, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    const data = await res.json();
+    renderCart(data.cart || data);
+  } catch (err) {
+    console.error("Failed to fetch cart", err);
+  }
 }
 
 // ================= RENDER CART =================
@@ -33,9 +40,11 @@ function renderCart(cart) {
 
     cartBox.innerHTML += `
       <div class="cart-item">
-        <h4>${item.title}</h4>
+        <h4>${item.name}</h4>
         <p>Price: ₹${item.price}</p>
-        <button onclick="removeFromCart('${item._id}')">Remove</button>
+        <button onclick="removeFromCart('${item._id}')">
+          Remove
+        </button>
       </div>
     `;
   });
@@ -47,12 +56,19 @@ function renderCart(cart) {
 }
 
 // ================= REMOVE ITEM =================
-function removeFromCart(id) {
-  fetch(`${CART_API}/${id}`, {
-    method: "DELETE"
-  })
-  .then(() => fetchCart())
-  .catch(err => console.error(err));
+async function removeFromCart(productId) {
+  try {
+    await fetch(`${CART_API}/${productId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    fetchCart();
+  } catch (err) {
+    console.error("Remove from cart failed", err);
+  }
 }
 
 // ================= INIT =================

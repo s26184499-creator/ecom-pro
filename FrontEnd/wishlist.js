@@ -1,20 +1,27 @@
 // ================= CONFIG =================
 const WISHLIST_API = "http://localhost:5000/api/wishlist";
-const userId = localStorage.getItem("userId");
 const wishlistBox = document.getElementById("wishlistItems");
 
-// ================= SAFETY CHECK =================
-if (!userId) {
+// ================= LOGIN CHECK =================
+if (sessionStorage.getItem("isLoggedIn") !== "true") {
   alert("Please login first");
   window.location.href = "login.html";
 }
 
 // ================= FETCH WISHLIST =================
-function fetchWishlist() {
-  fetch(`${WISHLIST_API}/${userId}`)
-    .then(res => res.json())
-    .then(data => renderWishlist(data.products))
-    .catch(err => console.error(err));
+async function fetchWishlist() {
+  try {
+    const res = await fetch(WISHLIST_API, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    const data = await res.json();
+    renderWishlist(data.products || data);
+  } catch (err) {
+    console.error("Wishlist fetch failed", err);
+  }
 }
 
 // ================= RENDER WISHLIST =================
@@ -31,21 +38,28 @@ function renderWishlist(products) {
       <div class="wishlist-item">
         <h4>${item.name}</h4>
         <p>Price: ₹${item.price}</p>
-        <button onclick="removeFromWishlist('${item._id}')">Remove</button>
+        <button onclick="removeFromWishlist('${item._id}')">
+          Remove
+        </button>
       </div>
     `;
   });
 }
 
 // ================= REMOVE ITEM =================
-function removeFromWishlist(productId) {
-  fetch(`${WISHLIST_API}/remove`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, productId })
-  })
-  .then(() => fetchWishlist())
-  .catch(err => console.error(err));
+async function removeFromWishlist(productId) {
+  try {
+    await fetch(`${WISHLIST_API}/${productId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    fetchWishlist();
+  } catch (err) {
+    console.error("Remove failed", err);
+  }
 }
 
 // ================= INIT =================

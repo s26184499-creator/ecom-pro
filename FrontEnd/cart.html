@@ -33,6 +33,34 @@
 </div>
 
 <script src="cart.js"></script>
+<script src="auth.js"></script>
+<script>
+  const userBox = document.getElementById("userBox");
+  const loginLink = document.getElementById("loginLink");
+  const signupLink = document.getElementById("signupLink");
+  const profileMenu = document.getElementById("profileMenu");
+  const profileName = document.getElementById("profileName");
 
+  if (isLoggedIn()) {
+    profileMenu.style.display = "inline-block";
+    profileName.innerText = "👤 " + getUserName() + " ▾";
+
+    loginLink.style.display = "none";
+    signupLink.style.display = "none";
+  } else {
+    profileMenu.style.display = "none";
+
+    loginLink.style.display = "inline";
+    signupLink.style.display = "inline";
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    const dropdown = document.getElementById("dropdownMenu");
+    if (!e.target.closest(".profile-menu")) {
+      dropdown.style.display = "none";
+    }
+  });
+</script>
 </body>
 </html>
